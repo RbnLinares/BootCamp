@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fortune Teller</title>
+</head>
+<body>
+    <div id="fortune"></div>
+
+    <script>
+        // Self-invoking function
+        (function(children, partnerName, location, jobTitle) {
+            // Construct the fortune message
+            const fortuneMessage = `You will be a ${jobTitle} in ${location}, and married to ${partnerName} with ${children} kids.`;
+            
+            // Display the fortune message in the DOM
+            document.getElementById('fortune').textContent = fortuneMessage;
+        })('3', 'Ruben Linares', 'Israel', 'Software Engineer');
+    </script>
+</body>
+</html>

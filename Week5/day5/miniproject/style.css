@@ -1,0 +1,23 @@
+main {
+    border: solid;
+    height: 90vh;
+    display: flex;
+}
+
+aside {
+    border: solid red;
+    height: 100%;
+    width: 20%;
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 5px
+}
+
+.board {
+    background-color: gray;
+    border:solid blue;
+    height: 100%;
+    width: 80%;
+
+}
