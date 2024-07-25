@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    color: rgb(18, 229, 57);
+    margin-left: 10px;
+}
+
+.nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0 10px;
+}
+#userNameDisplay {
+    margin-right: 10px;
+    color: aquamarine;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #a59ee5;
+    margin-right: 10px;
+}
+
+.nav a:hover {
+    color: #007bff;
+}
+
+main {
+    padding: 20px;
+    width: 67%; 
+    max-width: 800px; 
+    margin: 0 auto; 
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+input[type="number"], input[type="text"] {
+    padding: 5px; /* Reduced padding */
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 5px 10px; /* Reduced padding */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    bottom: 0;
+    width: 100%;
+}

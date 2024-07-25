@@ -1,0 +1,1634 @@
+'use strict';
+
+
+
+;define('pbr-client/app', ['exports', 'pbr-client/resolver', 'ember-load-initializers', 'pbr-client/config/environment'], function (exports, _resolver, _emberLoadInitializers, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  var App = Ember.Application.extend({
+    modulePrefix: _environment.default.modulePrefix,
+    podModulePrefix: _environment.default.podModulePrefix,
+    Resolver: _resolver.default
+  });
+
+  (0, _emberLoadInitializers.default)(App, _environment.default.modulePrefix);
+
+  exports.default = App;
+});
+;define('pbr-client/auth/garena', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        initialize: function initialize() {},
+        isAuthenticated: function isAuthenticated() {}
+    });
+});
+;define("pbr-client/auth/riot", ["exports"], function (exports) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        initialize: function initialize() {
+            console.log("Initialize triggered...");
+        },
+        isAuthenticated: function isAuthenticated() {
+            console.log("Is authenticated called");
+        }
+    });
+});
+;define('pbr-client/components/form-field', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+        i18n: Ember.inject.service(),
+        classNames: ['bug-report-field'],
+        classNameBindings: ['visible'],
+        visible: Ember.computed.alias('field.visible'),
+        type: Ember.computed.alias('field.type'),
+        error: Ember.computed.alias('field.error'),
+        inputVisibleClass: Ember.computed('field.inputVisible', function () {
+            return this.get('field.inputVisible') ? 'visible' : 'hidden';
+        }),
+        labelText: Ember.computed('field', 'field.{toggle,inputVisible}', function () {
+            var label = null;
+            if (this.get('field.toggle') && !this.get('field.inputVisible')) {
+                label = this.get('i18n').t('fields.' + this.get('field.name') + '.toggleLabel');
+            }
+            if (label === null || label === '') {
+                label = this.get('i18n').t('fields.' + this.get('field.name') + '.label');
+            }
+            return label;
+        }),
+        helpText: Ember.computed('field', function () {
+            return this.get('i18n').t('fields.' + this.get('field.name') + '.defaultValue');
+        }),
+        inputTemplate: Ember.computed('field', function () {
+            return this.get('field.type') + '-field-input';
+        })
+    });
+});
+;define('pbr-client/components/garena-toolbar', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+        logoutUrl: '/logout',
+        i18n: Ember.inject.service(),
+        router: Ember.inject.service(),
+        isAuthenticated: Ember.computed('authentication', function () {
+            return this.get('authentication').isAuthenticated();
+        }),
+        init: function init() {
+            this._super.apply(this, arguments);
+            this.set('languages', [{ id: "en_PH", label: "Philippines - English" }, { id: "en_SG", label: "Singapore - English" }, { id: "id_ID", label: "Bahasa Indonesia" }, { id: "ms_MY", label: "Bahasa Melayu" }, { id: "th_TH", label: "ภาษาไทย" }, { id: "vn_VN", label: "Tiếng Việt" }, { id: "zh_MY", label: "中文（简体）" }, { id: "zh_TW", label: "中文（繁體）" }]);
+            this.set('language', this.get('i18n.locale'));
+        },
+        language: '',
+        onLanguageChange: Ember.observer('language', function () {
+            var language = this.get('language');
+            this.set('i18n.locale', language);
+            this.router.transitionTo('/garena/' + language + '/bugReport/create');
+        }),
+        onLocaleChanged: Ember.observer('i18n.locale', function () {
+            var locale = this.get('i18n.locale');
+            this.set('language', locale);
+        }),
+        actions: {
+            changeLocale: function changeLocale(language) {
+                this.set('language', language);
+            }
+        }
+    });
+});
+;define('pbr-client/components/hidden-field-input', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Component.extend({});
+});
+;define("pbr-client/components/info-field-input", [], function () {
+  "use strict";
+});
+;define('pbr-client/components/korea-toolbar', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+        logoutUrl: _environment.default.APP.LOGOUT_URL,
+        isAuthenticated: Ember.computed(function () {
+            return this.get('authentication').isAuthenticated();
+        }),
+        i18n: Ember.inject.service()
+    });
+});
+;define('pbr-client/components/select-field-input', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+        return typeof obj;
+    } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+
+    exports.default = Ember.Component.extend({
+        i18n: Ember.inject.service(),
+        tagName: 'select',
+        name: Ember.computed.alias('field.name'),
+        required: Ember.computed.alias('field.required'),
+        attributeBindings: ['name', 'value', 'required'],
+        value: Ember.computed.alias('field.value'),
+        change: function change() {
+            this.set('field.value', this.$().val());
+        },
+        formattedOptions: Ember.computed('field.options', function () {
+            var formattedOptions = [{ value: '', label: '' }],
+                fieldName = this.get('field.name'),
+                options = this.get('field.options');
+
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i],
+                    value = (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' ? option.value : option,
+                    name = (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' ? option.name : null,
+                    label = (typeof option === 'undefined' ? 'undefined' : _typeof(option)) === 'object' ? option.label : option;
+
+                if (name != null) {
+                    label = name;
+                } else {
+                    label = this.get('i18n').t('fields.' + fieldName + '.options.' + label);
+                }
+
+                var optionGroupOptions = null;
+                if (option.options) {
+                    // Option group
+                    optionGroupOptions = [];
+                    for (var j = 0; j < option.options.length; j++) {
+                        var optionValue = option.options[j],
+                            optionLabel = this.get('i18n').t('fields.' + fieldName + '.options.' + option.options[j]);
+                        optionGroupOptions.push({ value: optionValue, label: optionLabel });
+                    }
+                }
+
+                formattedOptions.push({
+                    value: value,
+                    label: label,
+                    options: optionGroupOptions
+                });
+            }
+
+            return formattedOptions;
+        })
+    });
+});
+;define('pbr-client/components/testing-toolbar', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+        logoutUrl: '/logout',
+        i18n: Ember.inject.service(),
+        router: Ember.inject.service(),
+        isAuthenticated: Ember.computed('authentication', function () {
+            return this.get('authentication').isAuthenticated();
+        }),
+        init: function init() {
+            this._super.apply(this, arguments);
+            var allLanguages = ['en_BE', 'id_ID', 'ms_MY', 'en_PH', 'zh_MY', 'en_SG', 'th_TH', 'zh_TW', 'vn_VN', 'en_US', 'en_GB', 'de_DE', 'es_ES', 'fr_FR', 'it_IT', 'en_PL', 'pl_PL', 'el_GR', 'ro_RO', 'hu_HU', 'cs_CZ', 'es_MX', 'es_AR', 'pt_BR', 'ru_RU', 'tr_TR', 'en_AU', 'ja_JP', 'ko_KR'];
+            var supportedLanguages = [];
+            for (var i = 0; i < allLanguages.length; i++) {
+                supportedLanguages.push({ id: allLanguages[i], label: allLanguages[i] });
+            }
+            this.set('languages', supportedLanguages);
+            this.set('language', this.get('i18n.locale'));
+        },
+        language: '',
+        onLanguageChange: Ember.observer('language', function () {
+            var language = this.get('language');
+            this.set('i18n.locale', language);
+            this.router.transitionTo('/all/' + language + '/bugReport/create');
+        }),
+        onLocaleChanged: Ember.observer('i18n.locale', function () {
+            var locale = this.get('i18n.locale');
+            this.set('language', locale);
+        }),
+        actions: {
+            changeLocale: function changeLocale(language) {
+                this.set('language', language);
+            }
+        }
+    });
+});
+;define('pbr-client/components/text-field-input', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.TextField.extend({
+        value: Ember.computed.alias('field.value'),
+        name: Ember.computed.alias('field.name'),
+        maxlength: Ember.computed.alias('field.maxLength'),
+        required: Ember.computed.alias('field.required'),
+        'classNames': undefined,
+        init: function init() {
+            this.set('classNames', ['input-text', 'form-control']);
+            this._super();
+        }
+    });
+});
+;define('pbr-client/components/text-multiple-field-input', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Component.extend({
+        id: 0,
+        init: function init() {
+            this._super();
+            var value = this.get('field.value');
+            if (!value) {
+                value = [{ id: this.id++, name: '' }];
+            } else if (!(value instanceof Array)) {
+                value = [{ id: this.id++, name: value }];
+            }
+            this.set('values', value);
+        },
+        values: undefined,
+        onValuesChange: Ember.observer('values.@each.name', function () {
+            var str = this.get('values').map(function (val) {
+                return val.name;
+            }).join(',');
+            this.set('field.value', str);
+        }),
+        removeLinkClass: Ember.computed('values.[]', function () {
+            return this.get('values').length <= 1 ? 'hidden' : '';
+        }),
+        actions: {
+            addInput: function addInput() {
+                this.get('values').pushObject({ id: this.id++, name: '' });
+            },
+            removeInput: function removeInput(val) {
+                console.log("Remove Input: ", this, arguments);
+                this.get('values').removeAt(val);
+            }
+        }
+    });
+});
+;define('pbr-client/components/textarea-field-input', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+
+    var DEFAULT_VALUE = '\u200B';
+    exports.default = Ember.TextArea.extend({
+        i18n: Ember.inject.service(),
+        name: Ember.computed.alias('field.name'),
+        value: '',
+        required: Ember.computed.alias('field.required'),
+        init: function init() {
+            this._super.apply(this, arguments);
+            this.set('classNames', ['input-text', 'form-control']);
+            this.set('classNameBindings', ['isPlaceholder:placeholder']);
+
+            var fieldValue = this.get('field.value'),
+                fieldPlaceholder = this.get('field.placeholder');
+            if (fieldValue && fieldValue !== '') {
+                this.set('value', fieldValue);
+            } else if (fieldPlaceholder) {
+                this.set('value', fieldPlaceholder);
+            }
+        },
+        isPlaceholder: Ember.computed('value', function () {
+            var value = this.get('value'),
+                fieldPlaceholder = this.get('field.placeholder');
+            return value === fieldPlaceholder || value === DEFAULT_VALUE;
+        }),
+        valuechange: Ember.observer('value', function () {
+            var value = this.get('value'),
+                fieldPlaceholder = this.get('field.placeholder');
+            if (value !== fieldPlaceholder && value !== DEFAULT_VALUE) {
+                value = value.replace(DEFAULT_VALUE, '');
+                this.set('field.value', value);
+            }
+        }),
+        'focusIn': function focusIn() {
+            "use strict";
+
+            var value = this.get('value'),
+                fieldPlaceholder = this.get('field.placeholder');
+            if (value === fieldPlaceholder) {
+                this.set('value', DEFAULT_VALUE);
+            }
+        },
+        'focusOut': function focusOut() {
+            "use strict";
+
+            var value = this.get('value'),
+                fieldPlaceholder = this.get('field.placeholder');
+            if (value === DEFAULT_VALUE) {
+                this.set('value', fieldPlaceholder);
+            }
+        }
+    });
+});
+;define('pbr-client/components/welcome-page', ['exports', 'ember-welcome-page/components/welcome-page'], function (exports, _welcomePage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _welcomePage.default;
+    }
+  });
+});
+;define('pbr-client/controllers/application', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Controller.extend({
+        isGarena: Ember.computed(function () {
+            return _environment.default.APP.AUTHENTICATION === 'garena';
+        }),
+        isKorea: Ember.computed(function () {
+            return _environment.default.APP.AUTHENTICATION === 'korea';
+        }),
+        isTesting: Ember.computed(function () {
+            return _environment.default.APP.AUTHENTICATION === 'none';
+        })
+    });
+});
+;define('pbr-client/controllers/locale/bug-report/create', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Controller.extend({
+        actions: {
+            submit: function submit() {
+
+                var fields = this.get('model.form.fields'),
+                    localeData = this.get('model.localeData'),
+                    valid = true,
+                    that = this,
+                    i;
+
+                for (i = 0; i < fields.length; i++) {
+                    var fieldValue = fields[i].get('value');
+                    // Force value update if it hasnt already been touched
+                    if (fieldValue === null || fieldValue === undefined) {
+                        fields[i].set('value', '');
+                    }
+
+                    if (fields[i].get('error') !== null) {
+                        valid = false;
+                    }
+                }
+
+                if (valid) {
+                    var data = {
+                        region: localeData.region,
+                        locale: localeData.locale
+                    };
+
+                    for (i = 0; i < fields.length; i++) {
+                        data[fields[i].name] = fields[i].get('value');
+                    }
+                    this.set('submitting', true);
+
+                    $.ajax({
+                        url: '/bugs/create',
+                        data: JSON.stringify(data),
+                        type: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function success() {
+                            "use strict";
+
+                            that.transitionToRoute('locale.bugReport.thanks');
+                        },
+                        error: function error(jqXHR) {
+                            "use strict";
+
+                            if (jqXHR.status === 429) {
+                                that.set('statusMessage', "errors.rate_limit");
+                            } else {
+                                that.set('statusMessage', "errors.timeout");
+                            }
+                        },
+                        complete: function complete() {
+                            that.set('submitting', false);
+                        }
+                    });
+                }
+            }
+        }
+
+    });
+});
+;define('pbr-client/controllers/locale/login', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Controller.extend({
+        actions: {
+            login: function login() {
+                return this.get('authentication').login(this.get('model').queryParamString);
+            }
+        }
+
+    });
+});
+;define('pbr-client/helpers/app-version', ['exports', 'pbr-client/config/environment', 'ember-cli-app-version/utils/regexp'], function (exports, _environment, _regexp) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.appVersion = appVersion;
+  function appVersion(_) {
+    var hash = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var version = _environment.default.APP.version;
+    // e.g. 1.0.0-alpha.1+4jds75hf
+
+    // Allow use of 'hideSha' and 'hideVersion' For backwards compatibility
+    var versionOnly = hash.versionOnly || hash.hideSha;
+    var shaOnly = hash.shaOnly || hash.hideVersion;
+
+    var match = null;
+
+    if (versionOnly) {
+      if (hash.showExtended) {
+        match = version.match(_regexp.versionExtendedRegExp); // 1.0.0-alpha.1
+      }
+      // Fallback to just version
+      if (!match) {
+        match = version.match(_regexp.versionRegExp); // 1.0.0
+      }
+    }
+
+    if (shaOnly) {
+      match = version.match(_regexp.shaRegExp); // 4jds75hf
+    }
+
+    return match ? match[0] : version;
+  }
+
+  exports.default = Ember.Helper.helper(appVersion);
+});
+;define('pbr-client/helpers/pluralize', ['exports', 'ember-inflector/lib/helpers/pluralize'], function (exports, _pluralize) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _pluralize.default;
+});
+;define('pbr-client/helpers/singularize', ['exports', 'ember-inflector/lib/helpers/singularize'], function (exports, _singularize) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _singularize.default;
+});
+;define('pbr-client/helpers/t', ['exports', 'ember-i18n/helper'], function (exports, _helper) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _helper.default;
+    }
+  });
+});
+;define('pbr-client/initializers/app-version', ['exports', 'ember-cli-app-version/initializer-factory', 'pbr-client/config/environment'], function (exports, _initializerFactory, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  var name = void 0,
+      version = void 0;
+  if (_environment.default.APP) {
+    name = _environment.default.APP.name;
+    version = _environment.default.APP.version;
+  }
+
+  exports.default = {
+    name: 'App Version',
+    initialize: (0, _initializerFactory.default)(name, version)
+  };
+});
+;define('pbr-client/initializers/authentication', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.initialize = initialize;
+
+    //import authenticationRiot from 'pbr-client/services/authentication-riot.js';
+    //import authenticationGarena from 'pbr-client/services/garena.js';
+
+    function initialize(application) {
+        var authenticationProvider = 'service:authenticationNone';
+
+        if (_environment.default.APP.AUTHENTICATION === 'riot') {
+            authenticationProvider = 'service:authenticationRiot';
+        } else if (_environment.default.APP.AUTHENTICATION === 'qq') {
+            authenticationProvider = 'service:authenticationQq';
+        } else if (_environment.default.APP.AUTHENTICATION === 'garena') {
+            authenticationProvider = 'service:authenticationGarena';
+        } else if (_environment.default.APP.AUTHENTICATION === 'korea') {
+            authenticationProvider = 'service:authenticationKorea';
+        }
+
+        application.inject('route', 'authentication', authenticationProvider);
+        application.inject('controller', 'authentication', authenticationProvider);
+        application.inject('component', 'authentication', authenticationProvider);
+    }
+
+    exports.default = {
+        isServiceFactory: true,
+        name: 'authentication',
+        initialize: initialize
+    };
+});
+;define('pbr-client/initializers/container-debug-adapter', ['exports', 'ember-resolver/resolvers/classic/container-debug-adapter'], function (exports, _containerDebugAdapter) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'container-debug-adapter',
+
+    initialize: function initialize() {
+      var app = arguments[1] || arguments[0];
+
+      app.register('container-debug-adapter:main', _containerDebugAdapter.default);
+      app.inject('container-debug-adapter:main', 'namespace', 'application:main');
+    }
+  };
+});
+;define('pbr-client/initializers/cookie-injector', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = {
+        name: 'cookie-initializer',
+        after: ['cookie'],
+        initialize: function initialize(app) {
+            "use strict";
+
+            app.inject('route', 'cookie', 'cookie:main');
+            app.inject('service', 'cookie', 'cookie:main');
+        }
+    };
+});
+;define('pbr-client/initializers/cookie', ['exports', 'pbr-client/lib/cookie'], function (exports, _cookie) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'cookie',
+    initialize: function initialize() {
+      var app = arguments[1] || arguments[0];
+      app.register('cookie:main', _cookie.default);
+    }
+  };
+});
+;define('pbr-client/initializers/ember-data', ['exports', 'ember-data/setup-container', 'ember-data'], function (exports, _setupContainer) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'ember-data',
+    initialize: _setupContainer.default
+  };
+});
+;define('pbr-client/initializers/ember-i18n', ['exports', 'ember-i18n/initializers/ember-i18n'], function (exports, _emberI18n) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberI18n.default;
+});
+;define('pbr-client/initializers/export-application-global', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.initialize = initialize;
+  function initialize() {
+    var application = arguments[1] || arguments[0];
+    if (_environment.default.exportApplicationGlobal !== false) {
+      var theGlobal;
+      if (typeof window !== 'undefined') {
+        theGlobal = window;
+      } else if (typeof global !== 'undefined') {
+        theGlobal = global;
+      } else if (typeof self !== 'undefined') {
+        theGlobal = self;
+      } else {
+        // no reasonable global, just bail
+        return;
+      }
+
+      var value = _environment.default.exportApplicationGlobal;
+      var globalName;
+
+      if (typeof value === 'string') {
+        globalName = value;
+      } else {
+        globalName = Ember.String.classify(_environment.default.modulePrefix);
+      }
+
+      if (!theGlobal[globalName]) {
+        theGlobal[globalName] = application;
+
+        application.reopen({
+          willDestroy: function willDestroy() {
+            this._super.apply(this, arguments);
+            delete theGlobal[globalName];
+          }
+        });
+      }
+    }
+  }
+
+  exports.default = {
+    name: 'export-application-global',
+
+    initialize: initialize
+  };
+});
+;define('pbr-client/instance-initializers/ember-data', ['exports', 'ember-data/initialize-store-service'], function (exports, _initializeStoreService) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'ember-data',
+    initialize: _initializeStoreService.default
+  };
+});
+;define('pbr-client/instance-initializers/ember-i18n', ['exports', 'ember-i18n/instance-initializers/ember-i18n'], function (exports, _emberI18n) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberI18n.default;
+});
+;define('pbr-client/lib/cookie', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Object.extend({
+    setCookie: function setCookie(key, value, options) {
+      return new Ember.RSVP.Promise(function (resolve, reject) {
+        try {
+          Ember.$.cookie(key, value, options);
+          Ember.run(null, resolve);
+        } catch (e) {
+          Ember.run(null, reject, e);
+        }
+      });
+    },
+
+    getCookie: function getCookie(key) {
+      return Ember.$.cookie(key);
+    },
+
+    removeCookie: function removeCookie(key, options) {
+      return Ember.$.removeCookie(key, options);
+    }
+  });
+});
+;define('pbr-client/models/bug-report-form', ['exports', 'lodash', 'pbr-client/models/form-field'], function (exports, _lodash, _formField) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        formFields: null,
+        init: function init(gameData, i18n, queryParams, knownIssues) {
+            "use strict";
+
+            this.formFields = this.getDefaultFormFields();
+            var i,
+                form = {},
+                fieldInstances = [];
+
+            for (i = 0; i < this.formFields.length; i++) {
+                var item = this.formFields[i];
+                item.id = i;
+                item.inputVisible = !item.toggle;
+
+                if (queryParams[item.name]) {
+                    item.value = queryParams[item.name];
+                } else if (item.defaultValue) {
+                    item.placeholder = '' + i18n.t('fields.' + item.name + '.defaultValue');
+                }
+
+                var obj = _formField.default.create(item);
+                form[item.name] = obj;
+                this.set(item.name, obj);
+                fieldInstances.push(obj);
+            }
+
+            this.set('knownIssues', knownIssues);
+            this.set('fields', fieldInstances);
+            this.locationChange();
+            this.calculateKnownIssues();
+        },
+        getDefaultFormFields: function getDefaultFormFields() {
+            return [{
+                "type": "hidden",
+                "name": "bugType",
+                "visible": false,
+                "value": "standard"
+            }, {
+                "type": "hidden",
+                "name": "system_os",
+                "visible": false,
+                "value": ""
+            }, {
+                "type": "hidden",
+                "name": "app_version",
+                "visible": false,
+                "value": ""
+            }, {
+                "type": "select",
+                "name": "location",
+                "required": true,
+                "visible": true,
+                "options": ["pre_client", "client", "champ_select", "in_game"]
+            }, {
+                "type": "select",
+                "name": "type",
+                "required": false,
+                "visible": false,
+                "options": []
+
+            }, {
+                "type": "select",
+                "name": "known_issue",
+                "showEmpty": true,
+                "visible": false,
+                options: []
+            }, {
+                "type": "text",
+                "name": "summary",
+                "required": true,
+                "maxLength": 255,
+                "visible": true
+            }, {
+                "type": "textarea",
+                "name": "description",
+                "defaultValue": true,
+                "required": false,
+                "showHelpText": true,
+                "visible": true
+            }];
+        },
+
+        /**
+         * Update type fields when the location changes
+         */
+        locationChange: Ember.observer('location.value', function () {
+
+            var location = this.get('location.value'),
+                typeOptions = [],
+                typeVisible = true;
+
+            switch (location) {
+                case 'pre_client':
+                    typeOptions = ["pre_client_install", "pre_client_login", "pre_client_patching"];
+                    break;
+                case 'client':
+                    typeOptions = ["client_store", "client_loot", "client_profile", "client_collection", "client_eog", "client_friends", "client_other"];
+                    break;
+                case 'champ_select':
+                    typeOptions = ["champ_select_wards", "champ_select_emotes", "champ_select_skins", "champ_select_lockin", "champ_select_runes", "champ_select_other"];
+                    break;
+                case 'in_game':
+                    typeOptions = ['in_game_loading', 'in_game_map', 'in_game_champion', 'in_game_item', 'in_game_shop', 'in_game_ui', 'in_game_skin', 'in_game_other'];
+                    break;
+                default:
+                    typeVisible = false;
+            }
+
+            this.set('type.options', typeOptions);
+            this.set('type.visible', typeVisible);
+        }),
+        calculateKnownIssues: Ember.observer('location.value', 'type.value', function () {
+            "use strict";
+
+            var knownIssues = this.get('knownIssues'),
+                displayedKnownIssues = [],
+                type = this.get('type.value'),
+                location = this.get('location.value');
+
+            // Location, type, and tags must all be satisfied
+            _lodash.default.filter(knownIssues, function (knownIssue) {
+                if (knownIssue.location !== undefined && knownIssue.location !== null && knownIssue.location !== location) {
+                    return false;
+                } else if (knownIssue.type !== undefined && knownIssue.type !== null && knownIssue.type !== type) {
+                    return false;
+                }
+
+                displayedKnownIssues.push(knownIssue);
+            });
+            this.set('known_issue.visible', displayedKnownIssues.length > 0);
+            this.set('known_issue.options', displayedKnownIssues);
+        })
+    });
+});
+;define('pbr-client/models/form-field', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        init: function init() {
+            "use strict";
+
+            this.set('inputVisible', !this.get('toggle'));
+        },
+
+        type: null,
+        name: null,
+        defaultValue: null,
+        value: null,
+        required: false,
+        multiple: false,
+        maxLength: false,
+        visible: true,
+        inputVisible: true,
+        placeholder: null,
+        toggle: false,
+        options: undefined,
+        error: Ember.computed('visible', 'value', function () {
+            var value = this.get('value'),
+                required = this.get('required'),
+                visible = this.get('visible');
+            if (visible) {
+                if (required && value === '') {
+                    return 'validation.required';
+                }
+            }
+            return null;
+        })
+    });
+});
+;define('pbr-client/resolver', ['exports', 'ember-resolver'], function (exports, _emberResolver) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _emberResolver.default;
+});
+;define('pbr-client/router', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+
+  var Router = Ember.Router.extend({
+    location: _environment.default.locationType,
+    rootURL: _environment.default.rootURL
+  });
+
+  Router.map(function () {
+    this.route('oauth');
+    this.route('locale', { path: '/:locale/' });
+    this.route('locale', { path: '/:region/:locale' }, function () {
+      this.route('login');
+      this.route('bugReport', function () {
+        this.route('create', { path: '/create' });
+        this.route('thanks');
+      });
+    });
+  });
+
+  exports.default = Router;
+});
+;define('pbr-client/routes/application', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({});
+});
+;define('pbr-client/routes/index', ['exports', 'lodash', 'pbr-client/config/environment'], function (exports, _lodash, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Route.extend({
+        beforeModel: function beforeModel(transition) {
+            var authentication = this.get('authentication');
+
+            var region = Ember.$.cookie('pbr_region') || _environment.default.APP.DEFAULT_REGION,
+                lang = Ember.$.cookie('pbr_locale') || _environment.default.APP.DEFAULT_LOCALE;
+
+            if (_environment.default.APP.USE_RIOTBAR !== false) {
+                region = authentication.getDefaultRegion() || region;
+                lang = authentication.getDefaultLanguage() || lang;
+            }
+
+            // validate region and locale
+            if (_environment.default.APP.LOCALES[region] === undefined || !_lodash.default.isArray(_environment.default.APP.LOCALES[region]) || _environment.default.APP.LOCALES[region].indexOf(lang) === -1) {
+
+                // If the region is valid, find the best default locale
+                if (_lodash.default.isArray(_environment.default.APP.LOCALES[region])) {
+                    var defaultLocale = _environment.default.APP.LOCALES[region][0];
+                    if (lang && lang.indexOf('_')) {
+                        var parts = lang.split('_');
+                        // See if we can find a closer match - ex if its es_MX prefer es_AR
+                        // Currently a bug where RiotBar sets cookies incorrectly for LAS to es_MX
+                        _lodash.default.each(_environment.default.APP.LOCALES[region], function (locale) {
+                            if (locale.indexOf(parts[0]) === 0) {
+                                defaultLocale = locale;
+                            }
+                        });
+                    }
+                    lang = defaultLocale;
+                } else {
+                    region = _environment.default.APP.DEFAULT_REGION;
+                    lang = _environment.default.APP.DEFAULT_LOCALE;
+                }
+            }
+
+            this.router.transitionTo('/' + region + '/' + lang + '/bugReport/create?' + Ember.$.param(transition.queryParams));
+        }
+    });
+});
+;define('pbr-client/routes/locale', ['exports', 'lodash', 'pbr-client/config/environment'], function (exports, _lodash, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Route.extend({
+        i18n: Ember.inject.service(),
+        /**
+         * Loads translations for the provided locale (falls back to the next locale in the list if
+         * they cannot be found
+         * @param locales
+         * @returns {*}
+         */
+        loadTranslations: function loadTranslations(locales) {
+            var locale = locales.shift(),
+                that = this;
+
+            if (this.LOCALES_LOADED === undefined) {
+                this.LOCALES_LOADED = {};
+            }
+
+            // All the english (en_BE, en_US, en_GB) are the same - skip the failures and just load en
+            if (locale.indexOf('en_BE') === 0 || locale.indexOf('en_US') === 0) {
+                locale = 'en';
+            }
+
+            this.LOCALES_LOADED[locale] = new Ember.RSVP.Promise(function (resolve, reject) {
+                Ember.$.getJSON('/locales/' + locale + '/translations.json').then(function (data) {
+                    // add translations and set locale
+                    that.set('i18n.locale', locale);
+                    that.get('i18n').addTranslations(locale, data);
+                    resolve(data);
+                }, function (err) {
+                    reject(err);
+                });
+            }).catch(function () {
+                // Try the next
+                if (locales.length) {
+                    return that.loadTranslations(locales);
+                } else {
+                    return "Unable to load translations";
+                }
+            });
+
+            return this.LOCALES_LOADED[locale];
+        },
+        beforeModel: function beforeModel(transition) {
+            "use strict";
+
+            var locale = transition.params.locale.locale,
+                region = transition.params.locale.region;
+
+            if (region === undefined) {
+                region = 'riot';
+            }
+
+            Ember.$.removeCookie('pbr_region', { path: '/' });
+            Ember.$.removeCookie('pbr_locale', { path: '/' });
+            Ember.$.cookie('pbr_region', region, { path: '/' });
+            Ember.$.cookie('pbr_locale', locale, { path: '/' });
+
+            if (locale && locale.indexOf('-') > 0) {
+                var localeParts = locale.split('-');
+                locale = localeParts[0] + '_' + localeParts[1].toUpperCase();
+            }
+
+            if (locale !== transition.params.locale.locale || region !== transition.params.locale.region) {
+                this.transitionTo('/' + region + '/' + locale + '/bugReport/create?' + Ember.$.param(transition.queryParams));
+            }
+
+            // validate region and locale
+            if (_environment.default.APP.LOCALES[region] === undefined || !_lodash.default.isArray(_environment.default.APP.LOCALES[region]) || _environment.default.APP.LOCALES[region].indexOf(locale) === -1) {
+
+                // If the region is valid, find the best default locale
+                if (_lodash.default.isArray(_environment.default.APP.LOCALES[region])) {
+                    var defaultLocale = _environment.default.APP.LOCALES[region][0];
+                    if (locale && locale.indexOf('_')) {
+                        var parts = locale.split('_');
+                        // See if we can find a closer match - ex if its es_MX prefer es_AR
+                        // Currently a bug where RiotBar sets cookies incorrectly for LAS to es_MX
+                        _lodash.default.each(_environment.default.APP.LOCALES[region], function (locale) {
+                            if (locale.indexOf(parts[0]) === 0) {
+                                defaultLocale = locale;
+                            }
+                        });
+                    }
+                    locale = defaultLocale;
+                } else {
+                    region = _environment.default.APP.DEFAULT_REGION;
+                    locale = _environment.default.APP.DEFAULT_LOCALE;
+                }
+                this.transitionTo('/' + region + '/' + locale + '/bugReport/create?' + Ember.$.param(transition.queryParams));
+                return;
+            }
+
+            if (transition.targetName === 'locale.index') {
+                this.transitionTo('locale.bugReport.create', { queryParams: transition.queryParams });
+            }
+        },
+        /**
+         * Return a promsie that resolves after RiotBar has been successfully loaded into the page
+         * @returns {RSVP.Promise}
+         */
+        loadAuthentication: function loadAuthentication(params, queryParamString) {
+            return this.get('authentication').initialize(params, queryParamString);
+        },
+
+        model: function model(params, transition) {
+            var locale = params.locale,
+                locales = [],
+                that = this;
+
+            if (locale) {
+                locales.push(locale);
+            }
+
+            if (locale.indexOf('_') > 0) {
+                // if its en-us, try en
+                locales.push(params.locale.split('_')[0]);
+            }
+
+            // default locale
+            locales.push('en_US');
+            locales.push('en');
+            locales = locales.uniq();
+
+            var serializedQueryParams = transition.queryParams ? '?' + Ember.$.param(transition.queryParams) : '',
+                authentication = this.get('authentication');
+
+            return Ember.RSVP.all([this.loadAuthentication(params, serializedQueryParams), this.loadTranslations(locales.slice(0))]).then(function (data) {
+                document.title = that.get('i18n').t('title');
+
+                return {
+                    queryParams: transition.queryParams,
+                    // Save off query params incase we need them later for redirects
+                    queryParamString: serializedQueryParams,
+                    accountId: authentication.getAccountId(),
+                    loggedIn: authentication.isAuthenticated(),
+                    locale: params.locale,
+                    region: params.region,
+                    translations: data[1],
+                    knownIssues: data[2]
+                };
+            });
+        }
+    });
+});
+;define('pbr-client/routes/locale/bug-report/create', ['exports', 'pbr-client/config/environment', 'pbr-client/models/bug-report-form'], function (exports, _environment, _bugReportForm) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Route.extend({
+        i18n: Ember.inject.service(),
+        beforeModel: function beforeModel() {
+            "use strict";
+
+            var localizedData = this.modelFor('locale');
+            if (!localizedData.loggedIn && _environment.default.APP.LOGIN_REQUIRED) {
+                this.router.transitionTo('locale.login', { queryParams: localizedData.queryParams });
+            }
+        },
+        model: function model(params, transition) {
+            "use strict";
+
+            var localizedData = this.modelFor('locale'),
+                gameData = localizedData.gameData;
+
+            var title = this.get('i18n').t('title'),
+                supportDisclaimer = this.get('i18n').t('support_disclaimer'),
+                clickHere = this.get('i18n').t('click_here'),
+                supportURL = _environment.default.APP.SUBMIT_A_REQUEST_URL.replace('{LOCALE}', localizedData.locale.split('_')[0].toLowerCase());
+
+            var bugReportForm = new _bugReportForm.default(gameData, this.get('i18n'), transition.queryParams, localizedData.knownIssues);
+
+            return {
+                title: title,
+                submitText: this.get('i18n').t('buttons.submit'),
+                supportDisclaimer: supportDisclaimer,
+                clickHere: clickHere,
+                supportURL: supportURL,
+                localizedData: localizedData,
+                form: bugReportForm,
+                localeData: this.modelFor('locale')
+            };
+        }
+    });
+});
+;define('pbr-client/routes/locale/login', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Route.extend({
+        beforeModel: function beforeModel() {
+            "use strict";
+
+            var model = this.modelFor('locale');
+            if (model.loggedIn) {
+                this.router.transitionTo('locale.bugReport.create', { queryParams: model.queryParams });
+            }
+        }
+    });
+});
+;define('pbr-client/routes/oauth', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Route.extend({
+        beforeModel: function beforeModel() {
+            this.transitionTo('index');
+        }
+    });
+});
+;define('pbr-client/services/ajax', ['exports', 'ember-ajax/services/ajax'], function (exports, _ajax) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _ajax.default;
+    }
+  });
+});
+;define('pbr-client/services/authentication-garena', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        initialize: function initialize() {
+            return new Ember.RSVP.Promise(function (resolve) {
+                Ember.$('head').append('<link rel="stylesheet" type="text/css" href="assets/garena.css">');
+                resolve();
+            });
+        },
+        isAuthenticated: function isAuthenticated() {
+            return !!this.get('cookie').getCookie('GARENA_ACCESS_TOKEN') || undefined;
+        },
+        getAccountId: function getAccountId() {
+            return 0;
+        },
+        /**
+         * Returns the default region that should be used for the page, or undefined
+         * @returns {*}
+         */
+        getDefaultRegion: function getDefaultRegion() {
+            return undefined;
+        },
+        /**
+         * Returns the default language/locale that should be used, or undefined
+         * @returns {*|undefined}
+         */
+        getDefaultLanguage: function getDefaultLanguage() {
+            return undefined;
+        },
+        login: function login() /*queryParamString*/{
+            var locale = Ember.$.cookie('pbr_locale');
+            var garenaLocale = _environment.default.APP.GARENA_LOCALE_MAPPINGS[locale] || '';
+            // Redirect users back to base url after login
+            window.location = _environment.default.APP.OAUTH_URL + '&locale=' + garenaLocale;
+        }
+    });
+});
+;define('pbr-client/services/authentication-korea', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        initialize: function initialize() {
+            return new Ember.RSVP.Promise(function (resolve) {
+                Ember.$('head').append('<link rel="stylesheet" type="text/css" href ="https://fonts.googleapis.com/earlyaccess/notosanskr.css">' + '<link rel="stylesheet" type="text/css" href="assets/kr.css">');
+
+                resolve();
+            });
+        },
+        isAuthenticated: function isAuthenticated() {
+            return this.get('cookie').getCookie('PVPNET_ID_KR') && this.get('cookie').getCookie('PVPNET_TOKEN_KR');
+        },
+        getAccountId: function getAccountId() {
+            return this.get('cookie').getCookie('PVPNET_ID_KR');
+        },
+        login: function login() {
+            // Redirect users back to base url after login
+            window.location = _environment.default.APP.LOGIN_URL;
+        },
+        /**
+         * Returns the default region that should be used for the page, or undefined
+         * @returns {*}
+         */
+        getDefaultRegion: function getDefaultRegion() {
+            return 'kr';
+        },
+        /**
+         * Returns the default language/locale that should be used, or undefined
+         * @returns {*|undefined}
+         */
+        getDefaultLanguage: function getDefaultLanguage() {
+            return 'ko_KR';
+        }
+    });
+});
+;define('pbr-client/services/authentication-none', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        initialize: function initialize() {
+            return new Ember.RSVP.Promise(function (resolve) {
+                resolve();
+            });
+        },
+        isAuthenticated: function isAuthenticated() {
+            return true;
+        },
+        getAccountId: function getAccountId() {
+            return 0;
+        },
+        /**
+         * Returns the default region that should be used for the page, or undefined
+         * @returns {*}
+         */
+        getDefaultRegion: function getDefaultRegion() {
+            return 'all';
+        },
+        /**
+         * Returns the default language/locale that should be used, or undefined
+         * @returns {*|undefined}
+         */
+        getDefaultLanguage: function getDefaultLanguage() {
+            return 'en_US';
+        },
+        login: function login() {
+            // Perform login action
+        }
+    });
+});
+;define('pbr-client/services/authentication-riot', ['exports', 'pbr-client/config/environment'], function (exports, _environment) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Object.extend({
+        initialize: function initialize(params) {
+            if (_environment.default.APP.USE_RIOTBAR) {
+                return new Ember.RSVP.Promise(function (resolve) {
+                    var script = document.getElementById('riotbar');
+                    if (script === null && !window.RiotBar) {
+
+                        document.addEventListener("riotbar_onshowcomplete", function () {
+                            // Now the global window.RiotBar object is available to you, but not everything
+                            resolve();
+                        });
+
+                        Ember.$('<script type="text/javascript" id="riotbar"  src="https://cdn.rgpub.io/public/live/riotbar/latest/pbr-lol.' + params.locale + '.js"></script>').appendTo(document.head);
+                    } else {
+                        // RiotBar already exists
+                        resolve();
+                    }
+                });
+            } else {
+                return new Ember.RSVP.Promise(function (resolve) {
+                    resolve();
+                });
+            }
+        },
+        isAuthenticated: function isAuthenticated() {
+            var rb = window.RiotBar;
+            if (rb) {
+                var authState = rb.account.getAuthState();
+                if (authState && authState.isAuthenticated) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        getAccountId: function getAccountId() {
+            var rb = window.RiotBar;
+            return rb ? rb.account.getPvpnetId() : 0;
+        },
+        login: function login(queryParamString) {
+            // Redirect users back to base url after login
+            window.history.pushState({}, '', location.origin + queryParamString);
+            var rb = window.RiotBar;
+            if (rb) {
+                rb.account.login();
+            }
+        },
+        /**
+         * Returns the default region that should be used for the page, or undefined
+         * @returns {*}
+         */
+        getDefaultRegion: function getDefaultRegion() {
+            var rb = window.RiotBar;
+            if (rb) {
+                return rb.account.getRegion();
+            } else {
+                return undefined;
+            }
+        },
+        /**
+         * Returns the default language/locale that should be used, or undefined
+         * @returns {*|undefined}
+         */
+        getDefaultLanguage: function getDefaultLanguage() {
+            var rb = window.RiotBar;
+            if (rb) {
+                return rb.account.getLocale();
+            } else {
+                return undefined;
+            }
+        }
+    });
+});
+;define('pbr-client/services/i18n', ['exports', 'ember-i18n/services/i18n'], function (exports, _i18n) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _i18n.default;
+    }
+  });
+});
+;define("pbr-client/templates/application", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "I90vlKQN", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[7,\"div\"],[11,\"class\",\"backdrop\"],[9],[10],[0,\"\\n\"],[4,\"if\",[[23,[\"isKorea\"]]],null,{\"statements\":[[0,\"  \"],[1,[21,\"korea-toolbar\"],false],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[23,[\"isTesting\"]]],null,{\"statements\":[[0,\"  \"],[1,[21,\"testing-toolbar\"],false],[0,\"\\n\"]],\"parameters\":[]},null],[7,\"div\"],[11,\"id\",\"riotbar-header\"],[9],[10],[0,\"\\n\"],[7,\"div\"],[11,\"style\",\"width: 100%; clear: both; height: 20px;\"],[9],[10],[0,\"\\n\"],[7,\"div\"],[11,\"class\",\"section-wrapper\"],[11,\"style\",\"min-height: 600px; padding-bottom: 100px;\"],[9],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"section-quickbg\"],[9],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"section-wrapper-top\"],[9],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"section-wrapper-content\"],[9],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"section-wrapper-content-wrapper\"],[9],[0,\"\\n      \"],[1,[21,\"outlet\"],false],[0,\"\\n    \"],[10],[0,\"\\n  \"],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"section-wrapper-bottom\"],[9],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[7,\"div\"],[11,\"id\",\"riotbar-footer\"],[9],[10]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/application.hbs" } });
+});
+;define("pbr-client/templates/components/chosen-field-input", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "gt0/kXgp", "block": "{\"symbols\":[\"opt\"],\"statements\":[[4,\"if\",[[23,[\"field\",\"showEmpty\"]]],null,{\"statements\":[[0,\"  \"],[7,\"option\"],[11,\"value\",\"\"],[9],[10],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"each\",[[23,[\"field\",\"options\"]]],null,{\"statements\":[[4,\"if\",[[22,1,[\"selected\"]]],null,{\"statements\":[[0,\"    \"],[7,\"option\"],[12,\"value\",[28,[[22,1,[\"value\"]]]]],[11,\"selected\",\"\"],[9],[1,[22,1,[\"name\"]],false],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"    \"],[7,\"option\"],[12,\"value\",[28,[[22,1,[\"value\"]]]]],[9],[1,[22,1,[\"name\"]],false],[10],[0,\"\\n\"]],\"parameters\":[]}]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/chosen-field-input.hbs" } });
+});
+;define("pbr-client/templates/components/form-field", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "BSiCWLDv", "block": "{\"symbols\":[],\"statements\":[[7,\"hr\"],[11,\"class\",\"subtle-divider\"],[9],[10],[0,\"\\n\"],[7,\"h4\"],[9],[0,\"\\n\"],[4,\"if\",[[23,[\"field\",\"toggle\"]]],null,{\"statements\":[[0,\"    \"],[1,[27,\"input\",null,[[\"type\",\"class\",\"checked\"],[\"checkbox\",\"bug-report-input-toggle\",[23,[\"field\",\"inputVisible\"]]]]],false],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[7,\"label\"],[12,\"for\",[28,[[23,[\"field\",\"name\"]]]]],[9],[0,\"\\n    \"],[1,[21,\"labelText\"],false],[0,\"\\n\"],[4,\"if\",[[23,[\"field\",\"required\"]]],null,{\"statements\":[[0,\"      \"],[7,\"span\"],[11,\"class\",\"req\"],[9],[0,\"*\"],[10],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[10],[0,\"\\n\"],[4,\"if\",[[23,[\"field\",\"showHelpText\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\"],[12,\"class\",[28,[\"help-block subtle \",[21,\"helpClass\"]]]],[9],[1,[21,\"helpText\"],false],[10],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[23,[\"field\",\"error\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\"],[11,\"class\",\"error subtle error-block\"],[9],[0,\"\\n      \"],[1,[27,\"t\",[[23,[\"field\",\"error\"]]],null],false],[0,\"\\n    \"],[10],[0,\"\\n\"]],\"parameters\":[]},null],[10],[0,\"\\n\\n\"],[7,\"div\"],[12,\"class\",[28,[\"bug-report-input \",[21,\"inputVisibleClass\"]]]],[9],[0,\"\\n  \"],[1,[27,\"component\",[[23,[\"inputTemplate\"]]],[[\"field\"],[[23,[\"field\"]]]]],false],[0,\"\\n\"],[10],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/form-field.hbs" } });
+});
+;define("pbr-client/templates/components/garena-toolbar", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "UtUFrv+j", "block": "{\"symbols\":[\"locale\"],\"statements\":[[7,\"div\"],[11,\"class\",\"garena-toolbar\"],[9],[0,\"\\n  \"],[7,\"select\"],[11,\"class\",\"language-select\"],[12,\"onChange\",[27,\"action\",[[22,0,[]],\"changeLocale\"],[[\"value\"],[\"target.value\"]]]],[12,\"value\",[21,\"language\"]],[9],[0,\"\\n\"],[4,\"each\",[[23,[\"languages\"]]],null,{\"statements\":[[0,\"      \"],[7,\"option\"],[12,\"value\",[22,1,[\"id\"]]],[9],[1,[22,1,[\"label\"]],false],[10],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[10],[0,\"\\n\"],[4,\"if\",[[23,[\"isAuthenticated\"]]],null,{\"statements\":[[0,\"    \"],[7,\"a\"],[11,\"class\",\"logout-link\"],[11,\"href\",\"/logout\"],[9],[1,[27,\"t\",[\"logout\"],null],false],[10],[0,\"\\n\"]],\"parameters\":[]},null],[10]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/garena-toolbar.hbs" } });
+});
+;define("pbr-client/templates/components/info-field-input", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "wKeZu94g", "block": "{\"symbols\":[],\"statements\":[],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/info-field-input.hbs" } });
+});
+;define("pbr-client/templates/components/korea-toolbar", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "qdOBVXnc", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"if\",[[23,[\"isAuthenticated\"]]],null,{\"statements\":[[7,\"div\"],[11,\"class\",\"korea-toolbar\"],[9],[0,\"\\n    \"],[7,\"a\"],[11,\"class\",\"logout-link\"],[12,\"href\",[28,[[21,\"logoutUrl\"]]]],[9],[1,[27,\"t\",[\"logout\"],null],false],[10],[0,\"\\n\"],[10],[0,\"\\n\"]],\"parameters\":[]},null]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/korea-toolbar.hbs" } });
+});
+;define("pbr-client/templates/components/select-field-input", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "Z46bv/2W", "block": "{\"symbols\":[\"opt\",\"optGroupOption\"],\"statements\":[[4,\"each\",[[23,[\"formattedOptions\"]]],null,{\"statements\":[[4,\"if\",[[22,1,[\"options\"]]],null,{\"statements\":[[0,\"        \"],[7,\"optGroup\"],[12,\"label\",[28,[[22,1,[\"label\"]]]]],[9],[0,\"\\n\"],[4,\"each\",[[22,1,[\"options\"]]],null,{\"statements\":[[0,\"                \"],[7,\"option\"],[12,\"value\",[28,[[22,2,[\"value\"]]]]],[9],[1,[22,2,[\"label\"]],false],[10],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"        \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[7,\"option\"],[12,\"value\",[28,[[22,1,[\"value\"]]]]],[9],[1,[22,1,[\"label\"]],false],[10],[0,\"\\n\"]],\"parameters\":[]}]],\"parameters\":[1]},null]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/select-field-input.hbs" } });
+});
+;define("pbr-client/templates/components/testing-toolbar", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "vH2irCMV", "block": "{\"symbols\":[\"locale\"],\"statements\":[[7,\"div\"],[11,\"class\",\"testing-toolbar\"],[9],[0,\"\\n  \"],[7,\"select\"],[11,\"class\",\"language-select\"],[12,\"onChange\",[27,\"action\",[[22,0,[]],\"changeLocale\"],[[\"value\"],[\"target.value\"]]]],[12,\"value\",[21,\"language\"]],[9],[0,\"\\n\"],[4,\"each\",[[23,[\"languages\"]]],null,{\"statements\":[[0,\"      \"],[7,\"option\"],[12,\"value\",[22,1,[\"id\"]]],[9],[1,[22,1,[\"label\"]],false],[10],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[10],[0,\"\\n\"],[10]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/testing-toolbar.hbs" } });
+});
+;define("pbr-client/templates/components/text-multiple-field-input", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "0ZMGCJOm", "block": "{\"symbols\":[\"currentValue\",\"index\"],\"statements\":[[4,\"each\",[[23,[\"values\"]]],null,{\"statements\":[[0,\"    \"],[1,[27,\"input\",null,[[\"type\",\"class\",\"name\",\"required\",\"value\",\"key-press\"],[\"text\",\"input-text-multiple form-control\",[23,[\"field\",\"name\"]],[23,[\"field\",\"required\"]],[22,1,[\"name\"]],[27,\"action\",[[22,0,[]],\"updateInput\"],null]]]],false],[0,\"\\n    \"],[7,\"button\"],[12,\"class\",[28,[\"btn-small btn-small-primary remove-input \",[21,\"removeLinkClass\"]]]],[11,\"type\",\"button\"],[3,\"action\",[[22,0,[]],\"removeInput\",[22,2,[]]]],[9],[0,\"\\n        \"],[1,[27,\"t\",[\"buttons.removeLink\"],null],false],[0,\"\\n    \"],[10],[0,\"\\n\"]],\"parameters\":[1,2]},null],[0,\"\\n\"],[7,\"button\"],[11,\"class\",\"add-input btn-small btn-small-primary\"],[11,\"type\",\"button\"],[3,\"action\",[[22,0,[]],\"addInput\"]],[9],[1,[27,\"t\",[\"buttons.addLink\"],null],false],[10]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/components/text-multiple-field-input.hbs" } });
+});
+;define("pbr-client/templates/locale", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "q/49H7QK", "block": "{\"symbols\":[],\"statements\":[[1,[21,\"outlet\"],false],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/locale.hbs" } });
+});
+;define("pbr-client/templates/locale/bug-report/create", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "8Qt1zzOZ", "block": "{\"symbols\":[\"field\"],\"statements\":[[0,\" \"],[7,\"header\"],[11,\"class\",\"header-primary\"],[9],[0,\"\\n    \"],[7,\"h1\"],[9],[1,[23,[\"model\",\"title\"]],false],[10],[0,\"\\n\"],[10],[0,\"\\n\\n\"],[7,\"div\"],[11,\"class\",\"support-disclaimer\"],[9],[1,[23,[\"model\",\"supportDisclaimer\"]],false],[0,\" \"],[7,\"a\"],[12,\"href\",[28,[[23,[\"model\",\"supportURL\"]]]]],[9],[1,[23,[\"model\",\"clickHere\"]],false],[0,\".\"],[10],[10],[0,\"\\n\\n\"],[7,\"form\"],[3,\"action\",[[22,0,[]],\"submit\"],[[\"on\"],[\"submit\"]]],[9],[0,\"\\n    \"],[7,\"div\"],[9],[0,\"\\n\"],[4,\"each\",[[23,[\"model\",\"form\",\"fields\"]]],null,{\"statements\":[[0,\"            \"],[1,[27,\"form-field\",null,[[\"field\"],[[22,1,[]]]]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"    \"],[10],[0,\"\\n    \"],[7,\"hr\"],[11,\"class\",\"subtle-divider\"],[9],[10],[0,\"\\n\"],[4,\"if\",[[23,[\"statusMessage\"]]],null,{\"statements\":[[0,\"        \"],[7,\"div\"],[11,\"class\",\"error\"],[9],[1,[27,\"t\",[[23,[\"statusMessage\"]]],null],false],[10],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"unless\",[[23,[\"submitting\"]]],null,{\"statements\":[[0,\"        \"],[7,\"button\"],[11,\"class\",\"btn-large btn-large-primary\"],[11,\"type\",\"submit\"],[3,\"action\",[[22,0,[]],\"submit\"]],[9],[1,[23,[\"model\",\"submitText\"]],false],[10],[0,\"\\n\"]],\"parameters\":[]},null],[10],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/locale/bug-report/create.hbs" } });
+});
+;define("pbr-client/templates/locale/bug-report/lcu", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "6GnULZ+o", "block": "{\"symbols\":[\"field\"],\"statements\":[[7,\"header\"],[11,\"class\",\"header-primary\"],[9],[0,\"\\n    \"],[7,\"h1\"],[9],[1,[27,\"t\",[\"lcu.title\"],null],false],[10],[0,\"\\n\"],[10],[0,\"\\n\\n\"],[7,\"form\"],[3,\"action\",[[22,0,[]],\"submit\"],[[\"on\"],[\"submit\"]]],[9],[0,\"\\n    \"],[7,\"div\"],[9],[0,\"\\n\"],[4,\"each\",[[23,[\"model\",\"form\",\"fields\"]]],null,{\"statements\":[[0,\"            \"],[1,[27,\"form-field\",null,[[\"field\"],[[22,1,[]]]]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"    \"],[10],[0,\"\\n    \"],[7,\"hr\"],[11,\"class\",\"subtle-divider\"],[9],[10],[0,\"\\n\"],[4,\"if\",[[23,[\"statusMessage\"]]],null,{\"statements\":[[0,\"        \"],[7,\"div\"],[11,\"class\",\"error\"],[9],[1,[27,\"t\",[[23,[\"statusMessage\"]]],null],false],[10],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"unless\",[[23,[\"submitting\"]]],null,{\"statements\":[[0,\"        \"],[7,\"button\"],[11,\"class\",\"btn-large btn-large-primary\"],[11,\"type\",\"submit\"],[3,\"action\",[[22,0,[]],\"submit\"]],[9],[1,[27,\"t\",[\"buttons.submit\"],null],false],[10],[0,\"\\n\"]],\"parameters\":[]},null],[10],[0,\"\\n\"],[7,\"script\"],[11,\"type\",\"text/javascript\"],[9],[0,\"\\n    jQuery(function() {\\n        jQuery(\\\"body\\\").addClass(\\\"lcu-wrapper\\\");\\n    });\\n\"],[10]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/locale/bug-report/lcu.hbs" } });
+});
+;define("pbr-client/templates/locale/bug-report/thanks", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "Q6bK6m/I", "block": "{\"symbols\":[],\"statements\":[[7,\"header\"],[11,\"class\",\"header-primary\"],[9],[0,\"\\n    \"],[7,\"h1\"],[9],[1,[27,\"t\",[\"title\"],null],false],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[7,\"hr\"],[11,\"class\",\"subtle-divider\"],[9],[10],[0,\"\\n\"],[7,\"h3\"],[11,\"class\",\"status\"],[9],[0,\"\\n    \"],[7,\"span\"],[9],[1,[27,\"t\",[\"labels.thankYou\"],null],false],[10],[0,\"\\n    \"],[4,\"link-to\",[\"locale.bugReport.create\"],[[\"class\"],[\"btn btn-small btn-small-primary btn-no-borders\"]],{\"statements\":[[1,[27,\"t\",[\"labels.submitAnother\"],null],false]],\"parameters\":[]},null],[0,\"\\n    \"],[7,\"img\"],[11,\"class\",\"thanks-img\"],[11,\"src\",\"assets/thanks.png\"],[9],[10],[0,\"\\n\"],[10]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/locale/bug-report/thanks.hbs" } });
+});
+;define("pbr-client/templates/locale/login", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "QNVc1Jz9", "block": "{\"symbols\":[],\"statements\":[[7,\"header\"],[11,\"class\",\"header-primary\"],[9],[0,\"\\n  \"],[7,\"h1\"],[9],[1,[27,\"t\",[\"title\"],null],false],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[7,\"hr\"],[11,\"class\",\"subtle-divider\"],[9],[10],[0,\"\\n\"],[7,\"h3\"],[11,\"id\",\"user-message\"],[9],[0,\"\\n  \"],[7,\"a\"],[11,\"href\",\"#\"],[11,\"class\",\"btn-small btn-small-primary btn-no-borders\"],[3,\"action\",[[22,0,[]],\"login\"]],[9],[0,\"\\n  \"],[1,[27,\"t\",[\"please_login\"],null],false],[0,\"\\n  \"],[10],[0,\"\\n\"],[10],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "pbr-client/templates/locale/login.hbs" } });
+});
+;define('pbr-client/utils/i18n/compile-template', ['exports', 'ember-i18n/utils/i18n/compile-template'], function (exports, _compileTemplate) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _compileTemplate.default;
+    }
+  });
+});
+;define('pbr-client/utils/i18n/missing-message', ['exports', 'ember-i18n/utils/i18n/missing-message'], function (exports, _missingMessage) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _missingMessage.default;
+    }
+  });
+});
+;
+
+;define('pbr-client/config/environment', [], function() {
+  var prefix = 'pbr-client';
+try {
+  var metaName = prefix + '/config/environment';
+  var rawConfig = document.querySelector('meta[name="' + metaName + '"]').getAttribute('content');
+  var config = JSON.parse(unescape(rawConfig));
+
+  var exports = { 'default': config };
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+  return exports;
+}
+catch(err) {
+  throw new Error('Could not read config from meta tag with name "' + metaName + '".');
+}
+
+});
+
+;
+          if (!runningTests) {
+            require("pbr-client/app")["default"].create({"USE_RIOTBAR":true,"LOGIN_REQUIRED":true,"DEFAULT_REGION":"na","DEFAULT_LOCALE":"en_US","LOCALES":{"pbe":["en_BE"],"na":["en_US","vn_VN","zh_CN"],"euw":["en_GB","de_DE","es_ES","fr_FR","it_IT"],"eune":["en_PL","pl_PL","el_GR","ro_RO","hu_HU","cs_CZ","en_GB"],"lan":["es_MX"],"las":["es_AR"],"br":["pt_BR"],"ru":["ru_RU"],"tr":["tr_TR"],"oce":["en_AU"],"jp":["ja_JP"],"sg":["en_SG","zh_MY"],"th":["th_TH"],"ph":["en_PH"],"vn":["vi_VN"],"tw":["zh_TW","en_US","zh_CN"],"kr":["ko_KR"],"riot":["cs_CZ","de_DE","el_GR","en_AU","en_GB","en_PH","en_PL","en_SG","en_US","es_AR","es_ES","es_MX","fr_FR","hu_HU","it_IT","ja_JP","pl_PL","pt_BR","ro_RO","ru_RU","th_TH","tr_TR","vi_VN","vn_VN","zh_CN","zh_MY","zh_TW","ko_KR"]},"KNOWN_ISSUES_URL":"/data/known_issues.json","GAME_DATA_URL":"https://s.lolstatic.com/game-data/latest/live/gameData_{LOCALE}.json","SUBMIT_A_REQUEST_URL":"https://support.riotgames.com/hc/{LOCALE}","BUG_REPORT_FORM":"pbe","AUTHENTICATION":"riot","name":"pbr-client","version":"0.0.0+af277719"});
+          }
+        
+//# sourceMappingURL=pbr-client.map

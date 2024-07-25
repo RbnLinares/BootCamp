@@ -1,0 +1,74 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #333;
+    z-index: 1000; 
+}
+
+.navbar .logo img {
+    width: 100px;
+    margin-left: 40px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 40px;
+}
+
+.carousel .mySlide {
+    margin-top: 100px;
+    width: 100%;
+    height: auto; 
+}
+
+.carousel .mySlide:first-child {
+    display: block; 
+}
+
+.welcome-text {
+    padding-top: 100px; 
+    text-align: center;
+}
+
+.virtual-assistant {
+    position: absolute; 
+    top: 10%; 
+    left: 90%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    }
+
+.virtual-assistant img {
+    width: 50px;
+    margin-top: 200px;
+    border-radius: 50%;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="text"], input[type="email"] {
+    padding: 10px;
+}
+
+input[type="submit"] {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    width: 100%;
+}

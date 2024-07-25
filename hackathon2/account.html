@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    <link rel="stylesheet" href="accountstyles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <a href="welcome.html" class="logo">LG</a>
+        <span class="nav-title">Budget Administration</span>
+        <nav class="nav">
+            <span id="userNameDisplay"></span> <!-- Este es el elemento donde se mostrará el nombre de usuario -->
+        </nav>
+        
+    </header>
+    <main>
+        <main>
+            <section>
+                <h2>Annual Income</h2>
+                <input type="number" id="annualIncome" placeholder="Enter your annual income">
+                <button onclick="saveAnnualIncome()">Save Annual Income</button>
+            </section>
+            <section id="expensesSection">
+                <h2>Monthly Expenses</h2>
+                <div id="monthlyExpensesInputs">
+                    <!-- Monthly expenses inputs will be dynamically added here -->
+                </div>
+                <button onclick="saveMonthlyExpenses()">Save Monthly Expenses</button>
+                <button onclick="showSavedMonthlyExpenses()">Show Saved Monthly Expenses</button>            </section>
+        </main>
+        <canvas id="myChart"></canvas>
+    </main>
+    <footer class="footer">
+        <p>&copy; 2024 Granat Linares</p>
+    </footer>
+    <script src="account.js"></script>
+</body>
+</html>

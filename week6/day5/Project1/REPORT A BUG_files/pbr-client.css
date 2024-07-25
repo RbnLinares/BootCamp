@@ -1,0 +1,96 @@
+
+.btn-large {
+    cursor: pointer;
+}
+
+.visible {
+    display: block;
+}
+
+.error-block {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.field-championSkin option {
+    display: none;
+}
+
+.bug-report-field {
+    display: none;
+}
+
+.bug-report-field.visible {
+    display: block;
+}
+
+.bug-report-field textarea.form-control {
+    height: 200px;
+}
+
+.bug-report-input {
+    margin: 5px 0px;
+}
+
+.help-toggle {
+    margin-left: 5px;
+}
+
+.bug-report-field-hidden {
+    display: none;
+}
+
+.status {
+    text-align: center;
+    width: 100%;
+}
+
+.status > a {
+    margin-left: 5px;
+}
+
+select {
+}
+
+input.input-text,textarea {
+    width: 100%;
+    line-height: 18px;
+}
+
+.input-text.placeholder {
+    color: #777;
+}
+
+.input-text-multiple {
+    width: 50%;
+    line-height: 18px;
+}
+
+.remove-link {
+    margin-left: 5px;
+}
+
+.search-field {
+    min-width: 200px;
+}
+
+.help-toggle {
+    cursor: pointer;
+}
+
+.help-toggle:hover {
+    text-decoration: underline;
+}
+
+label .req {
+    color: red;
+    margin-left: 2px;
+}
+
+img.thanks-img {
+  padding-top: 20px;
+  max-width: 1000px;
+}

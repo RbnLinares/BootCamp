@@ -1,0 +1,228 @@
+ body {
+    background: url(./images/lcu_webform_backdrop.jpg) center top no-repeat fixed #000;
+    font-family: Spiegel;
+    color: #f0e6d2;
+    font-size: 14px;
+}
+
+form {
+    text-align: center;
+}
+
+.status a {
+
+}
+
+.section-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.bug-report-field .error-block {
+    font-weight: normal;
+    margin-left: 5px;
+}
+
+.section-wrapper .header-primary h1 {
+    padding: 40px 0px 10px 0px;
+    font-size: 32px;
+    font-family: "Beaufort for LOL";
+    font-weight: 100;
+    text-transform: uppercase;
+
+    background-color: rgba(0,0,0,0.00);
+}
+
+.bug-report-field {
+    margin: 15px 0px;
+    text-align: left;
+}
+
+.bug-report-field label,
+.support-disclaimer {
+    font-size: 20px;
+    font-weight: normal;
+    line-height: 1.4em;
+}
+
+.bug-report-input {
+    margin-left: 15px;
+}
+
+.bug-report-field input, .bug-report-field select, .bug-report-field textarea, .riot-select {
+    background-color: rgba(50,110,130,.1);
+    color: rgb(160, 155, 140);
+    background-image: none;
+    padding: .2em .3em;
+    font-size: 14px;
+
+    border: 1px solid #463714;
+    border-top-color: #785a28;
+    border-image: linear-gradient(to bottom, #785a28, #463714) 1 stretch
+}
+
+.bug-report-field select, .riot-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.bug-report-field select *, .riot-select {
+    background-color: #0A232D;
+    border-color: #c8aa6e;
+    color: #bd9d43;
+    background-image: none;
+}
+
+.bug-report-field select optgroup, .riot-select {
+    font-weight: bold;
+}
+
+.bug-report-field input:focus, .bug-report-field select:focus, .bug-report-field textarea:focus, .riot-select:focus {
+    border: 1px solid #6b5024;
+    border-top-color: #c8aa6e;
+    border-image: linear-gradient(to bottom, #c8aa6e, #6b5024) 1 stretch;
+    background-color: rgba(10,60,70,0.4);
+    outline: none;
+}
+
+.language-select {
+    width: 150px;
+    margin-right: 10px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: rgba(50,110,130,.1);
+    color: rgb(160, 155, 140);
+    background-image: none;
+    padding: .2em .3em;
+    font-size: 14px;
+
+    border: 1px solid #463714;
+    border-top-color: #785a28;
+    border-image: linear-gradient(to bottom, #785a28, #463714) 1 stretch
+}
+
+.language-select:focus {
+    border: 1px solid #6b5024;
+    border-top-color: #c8aa6e;
+    border-image: linear-gradient(to bottom, #c8aa6e, #6b5024) 1 stretch;
+    background-color: rgba(10,60,70,0.4);
+    outline: none;
+}
+
+.language-select * {
+    background-color: #0A232D;
+    border-color: #c8aa6e;
+    color: #bd9d43;
+    background-image: none;
+}
+
+
+.bug-report-field .help-block {
+    font-weight: normal;
+    color: rgb(160, 155, 140);
+    white-space: pre;
+    margin-left: 15px;
+}
+
+.subtle-divider {
+    display: block;
+    border: none;
+    height: 2px;
+    width: 100%;
+    background: -webkit-gradient(linear, left top, right top, color-stop(0, transparent), color-stop(25%, #816e3e), color-stop(75%, #816e3e), color-stop(100%, transparent));
+    background: -webkit-linear-gradient(left, transparent 0, #816e3e 25%, #816e3e 75%, transparent 100%);
+    background: -moz-linear-gradient(left, transparent 0, #816e3e 25%, #816e3e 75%, transparent 100%);
+    background: -ms-linear-gradient(left, transparent 0, #816e3e 25%, #816e3e 75%, transparent 100%);
+    background: -o-linear-gradient(left, transparent 0, #816e3e 25%, #816e3e 75%, transparent 100%);
+    background: linear-gradient(to right, transparent 0, #816e3e 25%, #816e3e 75%, transparent 100%)
+}
+
+.btn-small {
+    border: 1px solid #6b5024;
+    border-top-color: #c8aa6e;
+    border-image: linear-gradient(to bottom, #c8aa6e, #6b5024) 1 stretch
+}
+
+.btn-small:focus, .btn-small:hover {
+    border: 1px solid #906b30;
+    border-top-color: #ccbd8e;
+    border-image: linear-gradient(to bottom, #ccbd8e, #906b30) 1 stretch
+}
+
+
+.btn-small:disabled, .btn-small:active  {
+    border: 1px solid #463715;
+    border-top-color: #463715;
+    border-image: linear-gradient(to bottom, #463715, #463715) 1 stretch
+}
+
+.btn-small:focus, .btn-small:hover {
+    border: 1px solid #906b30;
+    border-top-color: #ccbd8e;
+    border-image: linear-gradient(to bottom, #ccbd8e, #906b30) 1 stretch
+}
+
+.btn-small.btn-no-borders, .btn-small.btn-no-borders:focus, .btn-small.btn-no-borders:hover {
+    border: 0px none;
+}
+.btn-large {
+    border: 3px solid #6b5024;
+    border-top-color: #c8aa6e;
+    border-image: linear-gradient(to bottom, #c8aa6e, #6b5024) 1 stretch
+}
+.btn-large:focus, .btn-large:hover{
+    border: 3px solid #906b30;
+    border-top-color: #ccbd8e;
+    border-image: linear-gradient(to bottom, #ccbd8e, #906b30) 1 stretch
+}
+
+.btn-large {
+    padding: 0 25px;
+    min-width: 180px;
+    height: 54px;
+    line-height: 54px;
+    font-size: 18px;
+    border-width: 3px;
+}
+
+.btn-large, .btn-small {
+    text-align: center;
+    font-family: "Beaufort for LOL";
+
+    color: #c9aa71;
+    text-transform: uppercase;
+    background: #191814;
+    border-radius: 0;
+    outline: 0;
+    box-shadow: inset 0 0 5px 2px rgba(0, 0, 0, .2);
+
+
+    transition: border .25s ease, color .25s ease, background-color .25s ease
+}
+
+.btn-large:focus, .btn-large:hover, .btn-small:focus, .btn-small:hover  {
+    background-color: #121212;
+    background-image: linear-gradient(to bottom, #121212, #121212 70%, #2e2a18);
+    color: #ede6d3;
+}
+
+.btn-large.disabled, .btn-large:active, .btn-small:disabled, .btn-small:active  {
+    background: #191814;
+    color: #423716;
+}
+
+.support-disclaimer {
+  color: #c9aa71;
+  text-align: center;
+}
+
+.support-disclaimer a {
+  color: #c9aa71;
+}
+
+.support-disclaimer a:hover {
+  color: #f0e6d2;
+}

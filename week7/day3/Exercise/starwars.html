@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Wars Web App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="swstyle.css">
+</head>
+<body>
+    <div class="header">
+        <a href="https://fontmeme.com/es/fuente-de-star-wars/"><img src="https://fontmeme.com/permalink/240409/a9d6dc2a08b41731f7de4530738ec4d7.png" alt="fuente-de-star-wars" border="0"></a>
+    </div>
+    <div class="container">
+        <div id="loading" class="hidden">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+        </div>
+        <div id="characterInfo" class="hidden">
+            <h2 id="characterName"></h2>
+            <p>Height: <span id="characterHeight"></span></p>
+            <p>Gender: <span id="characterGender"></span></p>
+            <p>Birth Year: <span id="characterBirthYear"></span></p>
+            <p>Home World: <span id="characterHomeWorld"></span></p>
+        </div>
+        <div id="error" class="hidden">
+            <p>Error loading character. Please try again.</p>
+        </div>
+    </div>
+    <div class="footer">
+        <button id="loadCharacter">Load Character</button>
+    </div>
+    <script src="swscript.js"></script>
+</body>
+</html>
+
